@@ -26,6 +26,7 @@ public class FlockingApp extends LogicThread {
     private STAGE stage = STAGE.START;
 
     private RobotMotion moat;
+    
     // Following array represents the neighbours for each bot and rf distance between them. Index represents the bot num. As following:
     // bots_neighbour [bot_number][0= beforeBot_name], bots_neighbour [bot_number][1= afterBot_name], bots_neighbour [bot_number][2= rf]
     private static String[][] botsNeighbor;
@@ -72,7 +73,6 @@ public class FlockingApp extends LogicThread {
 
         param = settings.build();
         moat.setParameters(param);
-        //n_waypoints = gvh.gps.getWaypointPositions().getNumPositions();
         n_waypoints = Integer.MAX_VALUE;
         String n = wpn + gvh.id.getName() + cur_waypoint;
         pl.update(new ItemPosition(n, 2000, 2000, 0));
@@ -86,33 +86,27 @@ public class FlockingApp extends LogicThread {
         Integer robotNum = getNumFromName(robotName);
         Integer count = 0;
         Integer leaderNum = 1;
-        boolean test = true;
 
         while(true) {
             switch (stage) {
                 case START: {
-
                     sn.barrierSync("round" + count.toString());
                     stage = STAGE.SYNC;
-
                     System.out.printf("robot %3d, round " + count.toString() + "\n", robotNum);
-
-
                     break;
                 }
                 case SYNC: {
                     if (sn.barrierProceed("round" + count.toString())) {
                         stage = STAGE.ELECT;
-                        // le.elect();
                     }
                     break;
                 }
                 case ELECT: {
                     if(le.getLeader() != null) {
                         System.out.printf("robot %3d, leader is: " + le.getLeader() + "\n", robotNum);
-                        //leaderNum = Integer.parseInt(le.getLeader().substring(3)); // assumes: botYYY
                         leaderNum = getNumFromName(le.getLeader());
                         stage = STAGE.MOVE;
+
                         // All below code in Elect state is to assign order-rank- for each robot in its group
                         if (robotNum!=leaderNum) {
                             if (gvh.BotGroup.setAfterBefore) {
@@ -121,18 +115,14 @@ public class FlockingApp extends LogicThread {
                                 int ranking = 1;
                                 PositionList plAll = gvh.gps.get_robot_Positions();
                                 ArrayList<ItemPosition> allBots = plAll.getList();
+
                                 for (ItemPosition rp :allBots ) {
-                                    //Integer rpNum = Integer.valueOf(rp.getName().substring(3));
                                     Integer rpNum = getNumFromName(rp.getName());
                                     if (rpNum != leaderNum) {
                                         if (rpNum != robotNum) {
-                                            // Integer rpGroup = Integer.valueOf(rp.getName().substring(3)) % Common.numOFgroups;
                                             Integer rpGroup = getNumFromName(rp.getName()) % Common.numOFgroups;
                                             if (gvh.BotGroup.getGroupNum() == rpGroup) {
                                                 int otherSummation =  rp.getX() + rp.getY();
-                                                // if (mySummation == otherSummation){
-
-                                                //}
                                                 if (mySummation == otherSummation)
                                                     System.out.println("############************** There is potential same locations ***************########### "+ robotName+" and "+ rp.getName());
 
@@ -147,17 +137,12 @@ public class FlockingApp extends LogicThread {
                                                     else {
                                                         int xSub = 0;
                                                         int ySub = 0;
-                                                        // int angleSub = 0;
                                                         PositionList plAllSub = gvh.gps.get_robot_Positions();
                                                         ArrayList<ItemPosition> allRobots = plAllSub.getList();
                                                         for (ItemPosition rpSub : allRobots) {
-                                                            //if (Integer.valueOf(rpSub.getName().substring(3)) == Integer.valueOf(gvh.BotGroup.BeforeBot.substring(3))) {
                                                             if (getNumFromName(rpSub.getName()) == getNumFromName(gvh.BotGroup.BeforeBot)) {
                                                                 xSub = rpSub.getX();
-                                                                ySub = rpSub.getY();
-                                                                //angleSub = rpSub.angle;
                                                             }
-
                                                         }
                                                         int beforeBotSummation = xSub + ySub ;
                                                         if (otherSummation > beforeBotSummation)
@@ -203,8 +188,6 @@ public class FlockingApp extends LogicThread {
                                                     ranking++;
                                                 } else gvh.BotGroup.AfterBot = rp.getName();
                                             }
-
-
                                         }
                                     }
                                 }
@@ -245,11 +228,6 @@ public class FlockingApp extends LogicThread {
                             RobotMessage m = new RobotMessage("ALL", name, SEND_NONES, content);
                             gvh.comms.addOutgoingMessage(m);
                         }
-
-                        /* For Testing purpose
-                        for (int i=0; i<Common.numOFbots; i++){
-                            System.out.println("bot"+i+" and his before bot is "+botsNeighbor[i][0]+" and his after bot is "+botsNeighbor[i][1]+" and group distance is "+botsNeighbor[i][2]);
-                        } */
 
                     }
                     break;
@@ -346,7 +324,6 @@ public class FlockingApp extends LogicThread {
                             //*********************** START: Rotation Back**********************
 
                             //*********************** Leader doesn't need any change
-                            // if (!gvh.id.getName().equals(le.getLeader())) {
 
                             if (is_Flocking()) {
                                 gvh.BotGroup.theta = gvh.BotGroup.theta + 20;
