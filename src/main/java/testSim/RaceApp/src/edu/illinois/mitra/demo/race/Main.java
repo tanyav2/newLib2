@@ -9,7 +9,9 @@ import static java.lang.Integer.parseInt;
  * Created by kek on 7/11/17.
  */
 public class Main {
+
     public static void main(String[] args) {
+
         SimSettings.Builder settings = new SimSettings.Builder();
         settings.OBSPOINT_FILE("Obstacles.wpt");
         settings.N_IROBOTS(parseInt(args[0]));
