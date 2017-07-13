@@ -11,7 +11,7 @@ public final class WptLoader {
 	}
 	
 	public static PositionList<ItemPosition> loadWaypoints(String file) {
-		PositionList<ItemPosition> waypoints = new PositionList<ItemPosition>();
+		PositionList<ItemPosition> waypoints = new PositionList<>();
 		BufferedReader in = null;
         InputStream inputStream =
                 WptLoader.class.getClassLoader().getResourceAsStream(file);
@@ -23,7 +23,7 @@ public final class WptLoader {
                 in = new BufferedReader(new FileReader("waypoints/" + file));
             } catch (FileNotFoundException e) {
                 System.err.println("File " + file + " not found! No waypoints loaded.");
-                return new PositionList<ItemPosition>();
+                return new PositionList<>();
             }
         }
 		String line;
@@ -31,6 +31,10 @@ public final class WptLoader {
 			while((line = in.readLine()) != null) {
 				String[] parts = line.replace(" ", "").split(",");
 				if(parts[0].equals("WAY") && parts.length == 6) {
+					System.out.println(Integer.parseInt(parts[1]));
+					System.out.println(Integer.parseInt(parts[2]));
+					System.out.println(Integer.parseInt(parts[3]));
+					System.out.println(parts[5]);
 					ItemPosition wpt = new ItemPosition(parts[4], Integer.parseInt(parts[1]), Integer.parseInt(parts[2]), Integer.parseInt(parts[3]), Integer.parseInt(parts[5]));
 					waypoints.update(wpt);
 				}

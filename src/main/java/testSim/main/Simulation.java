@@ -303,7 +303,6 @@ public class Simulation {
 
 								Model_iRobot ip = (Model_iRobot) targetList.get(i);
 								if(i<12){
-                            //        System.out.println(views.elementAt(i));
 									RobotData nextBot = new RobotData(ip.name, ip.x, ip.y, ip.angle, c[i], views.elementAt(i), ip.leftbump, ip.rightbump);
 									nextBot.radius = settings.BOT_RADIUS;
 									nextBot.type = ip.type;
