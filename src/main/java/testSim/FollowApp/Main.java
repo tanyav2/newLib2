@@ -21,7 +21,7 @@ public class Main {
         settings.N_QUADCOPTERS(parseInt(args[2]));
 
         // Pick how fast you want the simulation to run
-        settings.TIC_TIME_RATE(2);
+        settings.TIC_TIME_RATE(1);
 
         // Pick waypoints
         settings.WAYPOINT_FILE("square.wpt");

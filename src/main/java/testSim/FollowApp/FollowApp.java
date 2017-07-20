@@ -71,15 +71,10 @@ public class FollowApp extends LogicThread {
                     if(destinations.isEmpty()) {
                         stage = Stage.DONE;
                     } else {
-                        System.out.println("destinations:"+destinations);
-                        System.out.println("destIndex:"+destIndex);
                         currentDestination = getDestination(destinations, destIndex);
                         //Log.d(TAG, currentDestination.toString());
-                        System.out.println("before increment destIndex:"+destIndex);
                         destIndex++;
-                        System.out.println("after increment destIndex:"+destIndex);
                         if(destIndex >= numWaypoints) {
-                            System.out.println("is this happening? waypoints="+numWaypoints);
                             destIndex = 0;
                         }
                         System.out.println("currentDest:"+currentDestination);

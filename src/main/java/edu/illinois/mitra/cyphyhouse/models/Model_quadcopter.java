@@ -15,13 +15,16 @@ import edu.illinois.mitra.cyphyhouse.objects.PositionList;
  */
 
 public class Model_quadcopter extends ItemPosition implements TrackedRobot{
+
 	// for default values, see initial_helper()
 	public double yaw;
 	public double pitch;
 	public double roll;
+
 	//vertical speed
 	public double gaz;
 	public int radius;
+
 	// mass in kilograms
 	public double mass;
 	public int height;
@@ -31,21 +34,16 @@ public class Model_quadcopter extends ItemPosition implements TrackedRobot{
 	public double v_z;
 
 	public double v_yaw;
-	// angular speed
-	//	public double v_pitch;
-	//	public double v_roll;
-
-	//	private double a_yaw;
-	//	private double a_pitch;
-	//	private double a_roll;
 
 	public Random rand;
 
-	public double v_yawR = 0;;
+	public double v_yawR = 0;
 	public double pitchR = 0;
 	public double rollR = 0;
 	public double gazR = 0;
 
+	// the p represents predictions
+    // after adding in noise
 	private int x_p = 0;
 	private int y_p = 0;
 	private int z_p = 0;
@@ -55,8 +53,6 @@ public class Model_quadcopter extends ItemPosition implements TrackedRobot{
 	private double roll_p = 0.0;
 
 	private double v_yaw_p = 0.0;
-	//	private double v_pitch_p;
-	//	private double v_roll_p;
 
 	private double v_x_p = 0.0;
 	private double v_y_p = 0.0;
@@ -128,112 +124,8 @@ public class Model_quadcopter extends ItemPosition implements TrackedRobot{
 
 	@Override 
 	public String toString() {
-		return name + ": " + x + ", " + y + ", " + z + "; yaw, pitch, roll, gaz: " + yaw + ", " + pitch + ", " + roll + " ," + gaz;
+		return name + ": " + x + ", " + y + ", " + z + "; yaw, pitch, roll, vertical_speed: " + yaw + ", " + pitch + ", " + roll + " ," + gaz;
 	}
-
-	/** 
-	 * 
-	 * @return true if one robot is facing another robot/point
-	 */
-	/*
-	public boolean isFacing(Point3d other) { 
-		if(other == null) {
-			return false;
-		}
-		if(other.x == this.x && other.y == this.y){
-			return true;
-		}
-    	double angleT = Math.toDegrees(Math.atan2((other.y - this.y) , (other.x - this.x)));
-    	if(angleT  == 90){
-    		if(this.y < other.y)
-    			angleT = angleT + 90;
-    		double temp = this.angle % 360;
-    		if(temp > 0)
-    			return true;
-    		else
-    			return false;
-    	}
-		if(angleT < 0)
-		{
-			angleT += 360;
-		}
-		double angleT1, angleT2, angleself;
-		angleT1 = (angleT - 90) % 360;
-		if(angleT1 < 0)
-		{
-			angleT1 += 360;
-		}
-		angleT2 = (angleT + 90) % 360;
-		if(angleT2 < 0)
-		{
-			angleT2 += 360;
-		}
-		angleself = this.angle % 360;
-		if(angleself < 0)
-		{
-			angleself += 360;
-		}
-		if(angleT2 <= 180)
-		{
-			if((angleself < angleT1) && (angleself > angleT2))
-				return false;
-			else
-				return true;
-		}
-		else
-		{
-			if(angleself > angleT2 || angleself < angleT1)
-				return false;
-			else
-				return true;
-
-		}
-	}
-	 */
-
-	/** 
-	 * @param other The ItemPosition to measure against
-	 * @return Number of degrees this position must rotate to face position other
-	 */
-	/*
-	public <T extends Point3d> int angleTo(T other) {
-		if(other == null) {
-			return 0;
-		}
-
-		int delta_x = other.x - this.x;
-		int delta_y = other.y - this.y;
-		double angle = this.angle;
-		int otherAngle = (int) Math.toDegrees(Math.atan2(delta_y,delta_x));
-		if(angle > 180) {
-			angle -= 360;
-		}
-		int retAngle = Common.min_magitude((int)(otherAngle - angle),(int)(angle - otherAngle));
-		retAngle = retAngle%360;
-		if(retAngle > 180) {
-			retAngle = retAngle-360;
-		}
-		if(retAngle <= -180) {
-			retAngle = retAngle+360;
-		}
-		if(retAngle > 180 || retAngle< -180){
-			System.out.println(retAngle);
-		}
-		return  Math.round(retAngle);
-	}
-
-	public void setPos(int x, int y, int angle) {
-		this.x = x;
-		this.y = y;
-		this.angle = angle;
-	}
-
-	public void setPos(Model_Quadcopter other) {
-		this.x = other.x;
-		this.y = other.y;
-		this.angle = other.angle;
-	}
-	 */
 
 
 	private void initial_helper(){
@@ -248,35 +140,29 @@ public class Model_quadcopter extends ItemPosition implements TrackedRobot{
 		v_z = 0.0;
 		v_yaw = 0.0;
 		gaz = 0.0;
-		//		a_yaw = 0;
-		//		a_pitch = 0;
-		//		a_roll = 0;
 	}
 
 	@Override
 	public Point3d predict(double[] noises, double timeSinceUpdate) {
+
 		if(noises.length != 3){
 			System.out.println("Incorrect number of noises parameters passed in, please pass in x, y, z, yaw, pitch, roll noises");
 			return new Point3d(x,y,z);
 		}
-		v_yaw += (v_yawR - v_yaw)*timeSinceUpdate;
-		pitch += (pitchR - pitch)*timeSinceUpdate;
-		roll += (rollR-roll)*timeSinceUpdate;
-		gaz += (gazR-gaz)*timeSinceUpdate;
 
-		double xNoise = (rand.nextDouble()*2*noises[0]) - noises[0];
-		double yNoise = (rand.nextDouble()*2*noises[0]) - noises[0];
-		double zNoise = (rand.nextDouble()*2*noises[0]) - noises[0];
-		double yawNoise = (rand.nextDouble()*2*noises[1]) - noises[1];
+		v_yaw += (v_yawR - v_yaw) * timeSinceUpdate;
+		pitch += (pitchR - pitch) * timeSinceUpdate;
+		roll += (rollR-roll) * timeSinceUpdate;
+		gaz += (gazR- gaz) * timeSinceUpdate;
+
+		double xNoise = (rand.nextDouble() * 2 * noises[0]) - noises[0];
+		double yNoise = (rand.nextDouble() * 2 * noises[0]) - noises[0];
+		double zNoise = (rand.nextDouble() * 2 * noises[0]) - noises[0];
+		double yawNoise = (rand.nextDouble() * 2 * noises[1]) - noises[1];
 
 		windt += timeSinceUpdate;
-		windxNoise =  xNoise + windx*Math.sin(windt);
-		windyNoise =  yNoise + windy*Math.sin(windt);
-
-
-		//	double yawNoise = (rand.nextDouble()*2*noises[3]) - noises[3];
-		//double pitchNoise = (rand.nextDouble()*2*noises[4]) - noises[4];
-		//double rollNoise = (rand.nextDouble()*2*noises[5]) - noises[5];
+		windxNoise = xNoise + windx * Math.sin(windt);
+		windyNoise = yNoise + windy * Math.sin(windt);
 
 		//TODO: correct the model
 
@@ -284,45 +170,41 @@ public class Model_quadcopter extends ItemPosition implements TrackedRobot{
 		// mass in kilograms
 		// each pixel is 1 millimeter
 		// timeSinceUpdate is in second
-		int dX = (int) (xNoise + v_x*timeSinceUpdate + windxNoise);
-		int dY= (int) (yNoise +  v_y*timeSinceUpdate + windyNoise);
-		int dZ= (int) (zNoise +  gaz*timeSinceUpdate);
+		int dX = (int)(xNoise + v_x*timeSinceUpdate + windxNoise);
+		int dY = (int)(yNoise + v_y*timeSinceUpdate + windyNoise);
+		int dZ = (int)(zNoise + gaz*timeSinceUpdate);
 
-		x_p = x+dX;
-		y_p = y+dY;
-		z_p = z+dZ;
+		x_p = x + dX;
+		y_p = y + dY;
+		z_p = z + dZ;
 
 		double thrust;
 		if((mass * Math.cos(Math.toRadians(roll)) * Math.cos(Math.toRadians(pitch))) != 0){
-			thrust = ((gaz+1000) / (mass * Math.cos(Math.toRadians(roll))) / (Math.cos(Math.toRadians(pitch))));
-		}
-		else{
+			thrust = ((gaz + 1000) / (mass * Math.cos(Math.toRadians(roll))) / (Math.cos(Math.toRadians(pitch))));
+		} else{
 			thrust = 1000;
 		}
 
-		//double thrust = Math.abs((gaz) * (mass * Math.cos(Math.toRadians(roll)) * Math.cos(Math.toRadians(pitch))));
-		//double thrust = 100;
-		double dv_x = - ((thrust)  * (Math.sin(Math.toRadians(roll)) * Math.sin(Math.toRadians(yaw)) + Math.cos(Math.toRadians(roll)) * Math.sin(Math.toRadians(pitch)) * Math.cos(Math.toRadians(yaw))))/ (mass) ;
-		double dv_y = ((thrust)  * (Math.sin(Math.toRadians(roll)) * Math.cos(Math.toRadians(yaw)) - Math.cos(Math.toRadians(roll)) * Math.sin(Math.toRadians(pitch)) * Math.sin(Math.toRadians(yaw))))/ (mass) ;
-
+		double dv_x = - (thrust * Math.sin(Math.toRadians(roll) * Math.sin(Math.toRadians(yaw)) + Math.cos(Math.toRadians(roll)) * Math.sin(Math.toRadians(pitch)) * Math.cos(Math.toRadians(yaw))))/ (mass) ;
+		double dv_y = (thrust * (Math.sin(Math.toRadians(roll)) * Math.cos(Math.toRadians(yaw)) - Math.cos(Math.toRadians(roll)) * Math.sin(Math.toRadians(pitch)) * Math.sin(Math.toRadians(yaw))))/ (mass) ;
 
 		v_x_p = v_x + dv_x * timeSinceUpdate;
 		v_y_p = v_y + dv_y * timeSinceUpdate;
 		v_z_p = gaz;
 
-		double dYaw = (v_yaw*timeSinceUpdate);
-		yaw_p = (yaw + dYaw) %360;	
+		double dYaw = (v_yaw * timeSinceUpdate);
+		yaw_p = (yaw + dYaw) % 360;
 
 		return new Point3d(x_p, y_p, z_p);
 	}
 
 	@Override
 	public void collision(Point3d collision_point) {
+
 		// No collision point, set both sensor to false
 		if(collision_point == null){
 			return;
-		}
-		else{
+		} else{
 			gaz = -1000;
 		}
 	}
@@ -333,14 +215,8 @@ public class Model_quadcopter extends ItemPosition implements TrackedRobot{
 			x = x_p;
 			y = y_p;
 			z = z_p;
-
 			yaw = yaw_p;
-			//		pitch = pitch_p;
-			//		roll = roll_p;
 			v_yaw = v_yaw_p;
-			//		v_pitch = v_pitch_p;
-			//		v_roll = v_roll_p;
-
 			v_x = v_x_p;
 			v_y = v_y_p;
 			v_z = v_z_p;	

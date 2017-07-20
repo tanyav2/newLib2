@@ -27,6 +27,7 @@ public class FlockingApp extends LogicThread {
 
     private RobotMotion moat;
 
+
     // Following array represents the neighbours for each bot and rf distance between them. Index represents the bot num. As following:
     // bots_neighbour [bot_number][0= beforeBot_name], bots_neighbour [bot_number][1= afterBot_name], bots_neighbour [bot_number][2= rf]
     private static String[][] botsNeighbor;

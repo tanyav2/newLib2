@@ -20,4 +20,15 @@ public class Point {
         this.x = x;
         this.y = y;
     }
+
+    public static double distance(Point a, Point b) {
+        double xDiff = (double)Math.abs(a.x - b.x);
+        double yDiff = (double)Math.abs(a.y - b.y);
+
+        double xSquare = xDiff*xDiff;
+        double ySquare = yDiff*yDiff;
+
+        return xSquare + ySquare;
+
+    }
 }

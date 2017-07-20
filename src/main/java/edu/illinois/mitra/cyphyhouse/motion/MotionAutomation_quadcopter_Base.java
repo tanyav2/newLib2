@@ -32,8 +32,16 @@ public class MotionAutomation_quadcopter_Base extends RobotMotion {
 	private Model_quadcopter mypos;
 
 
+	// Added STAGEs - VERTICAL_ASC and DESC, YAW_LEFT, YAW_RIGHT
+    // yaw left means move nose left and vice versa
+    // pitch forward means move nose downward and vice versa
+    // roll left (increase rpm on left motors which leads to a rise on the left and dip on right)
+    // roll right (increase rpm on right motors etc)
 	protected enum STAGE {
-		INIT, MOVE, HOVER, TAKEOFF, LAND, GOAL, STOP
+		INIT, MOVE, HOVER, TAKEOFF, LAND, GOAL, STOP,
+        VERTICAL_ASCENT, VERTICAL_DESCENT, YAW_LEFT, YAW_RIGHT,
+        PITCH_FORWARD, PITCH_BACKWARD,
+        ROLL_LEFT, ROLL_RIGHT
 	}
 
 	private STAGE next = null;
@@ -52,14 +60,11 @@ public class MotionAutomation_quadcopter_Base extends RobotMotion {
 	private volatile MotionParameters param = DEFAULT_PARAMETERS;
 	//need to pass some more parameteres into this param
 	//	MotionParameters.Builder settings = new MotionParameters.Builder();
-
-
 	//	private volatile MotionParameters param = settings.build();
 
 	public MotionAutomation_quadcopter_Base(GlobalVarHolder gvh) {
 		super(gvh.id.getName());
 		this.gvh = gvh;
-
 	}
 
 	public void goTo(ItemPosition dest, ObstacleList obsList) {
@@ -70,7 +75,6 @@ public class MotionAutomation_quadcopter_Base extends RobotMotion {
 		if((inMotion && !this.destination.equals(dest)) || !inMotion) {
 			done = false;
 			this.destination = new ItemPosition(dest.name,dest.x,dest.y,dest.z);
-			//this.destination = dest;
 			this.mode = OPMODE.GO_TO;
 			startMotion();
 		}
@@ -88,18 +92,24 @@ public class MotionAutomation_quadcopter_Base extends RobotMotion {
 		gvh.threadCreated(this);
 		// some control parameters
 		double kpx,kpy,kpz, kdx,kdy,kdz;
+
+		// what are these magic numbers ??
 		kpx = kpy = kpz = 0.00033;
 		kdx = kdy = kdz = 0.0006;
+
 		while(true) {
-			//			gvh.gps.getObspointPositions().updateObs();
+
 			if(running) {
 				mypos = (Model_quadcopter)gvh.plat.getModel();
-//				System.out.println(mypos.toString());
+
 				int distance = (int) Math.sqrt(Math.pow((mypos.x - destination.x),2) + Math.pow((mypos.y - destination.y), 2)); 
-				//int distance = mypos.distanceTo(destination);		
+
 				if(mypos.gaz < -50){
-			//		System.out.println("going down");
+			        //System.out.println("going down");
 				}
+
+				// If the quadcopter is not trying to land but it's
+                // about to hit the ground, set colliding to true
 				colliding = (stage != STAGE.LAND && mypos.gaz < -50);
 
 				if(!colliding && stage != null) {
@@ -138,16 +148,13 @@ public class MotionAutomation_quadcopter_Base extends RobotMotion {
 							Ax_d = (kpx * (destination.x - mypos.x) - kdx * mypos.v_x) ;
 							Ay_d = (kpy * (destination.y - mypos.y) - kdy * mypos.v_y) ;
 							Ryaw = Math.atan2(destination.y - mypos.y, destination.x - mypos.x);
-							//Ryaw = Math.atan2((destination.y - mypos.x), (destination.x - mypos.y));
+
 							Ryawsp = kpz * ((Ryaw - Math.toRadians(mypos.yaw)));
 							Rroll = Math.asin((Ay_d * Math.cos(Math.toRadians(mypos.yaw)) - Ax_d * Math.sin(Math.toRadians(mypos.yaw))) %1);
 							Rpitch = Math.asin( (-Ay_d * Math.sin(Math.toRadians(mypos.yaw)) - Ax_d * Math.cos(Math.toRadians(mypos.yaw))) / (Math.cos(Rroll)) %1);
 							Rvs = (kpz * (destination.z - mypos.z) - kdz * mypos.v_z);
-						//	System.out.println(Ryaw + " , " + Ryawsp + " , " +  Rroll  + " , " +  Rpitch + " , " + Rvs);
 
 							setControlInputRescale(Math.toDegrees(Ryawsp),Math.toDegrees(Rpitch)%360,Math.toDegrees(Rroll)%360,Rvs);
-							//setControlInput(Ryawsp/param.max_yaw_speed, Rpitch%param.max_pitch_roll, Rroll%param.max_pitch_roll, Rvs/param.max_gaz);
-							//next = STAGE.INIT;
 						}
 						break;
 					case HOVER:
@@ -219,8 +226,6 @@ public class MotionAutomation_quadcopter_Base extends RobotMotion {
 					gvh.log.i("FailFlag", "write");
 					done = false;
 					motion_stop();
-				//	land();
-				//	stage = STAGE.LAND;
 				}
 			}
 			gvh.sleep(param.AUTOMATON_PERIOD);
@@ -269,6 +274,7 @@ public class MotionAutomation_quadcopter_Base extends RobotMotion {
 			return value/max_value;
 		}
 	}
+
 //TODO: change this func to integrate the hardware control.
 	protected void setControlInput(double yaw_v, double pitch, double roll, double gaz){
 		if(yaw_v > 1 || yaw_v < -1){
@@ -298,7 +304,7 @@ public class MotionAutomation_quadcopter_Base extends RobotMotion {
 	}
 
 	/**
-	 *  	take off from ground
+	 *  take off from ground
 	 */
 	protected void takeOff(){
 		//Bluetooth command to control the drone
