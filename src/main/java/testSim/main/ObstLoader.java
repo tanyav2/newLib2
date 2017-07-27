@@ -25,6 +25,7 @@ public class ObstLoader {
                 return new ObstacleList();
             }
         }
+
 		
 		String line;
 		try {
@@ -35,7 +36,10 @@ public class ObstLoader {
 						int j;
 						for(j = 1; j<((parts.length)-2); j+=2)
 						{
-							point.add(Integer.parseInt(parts[j]),Integer.parseInt(parts[j+1]));
+						    // added a parseInt to account for z coordinates
+                            // the fact that the irobot doesn't give a shit about the z coordinates
+                            // might be because we dont' seem to give a shit about z
+							point.add(Integer.parseInt(parts[j]),Integer.parseInt(parts[j+1]), Integer.parseInt(parts[j+2]));
 						}
 						point.timeFrame = Integer.parseInt(parts[j]);
 						point.hidden = false;

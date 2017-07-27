@@ -21,10 +21,11 @@ public class Main {
         settings.N_QUADCOPTERS(parseInt(args[2]));
 
         // Pick how fast you want the simulation to run
-        settings.TIC_TIME_RATE(1);
+        settings.TIC_TIME_RATE(2);
 
         // Pick waypoints
-        settings.WAYPOINT_FILE("square.wpt");
+        settings.WAYPOINT_FILE("3dobstaclepoints.wpt");
+        settings.OBSPOINT_FILE("square.wpt");
 
         // No idea what it does
         // NOTE : if set to true or commented out, simulation hangs and no movement happens
@@ -42,6 +43,5 @@ public class Main {
         // Instantiate and start the simulation thread
         Simulation sim = new Simulation(FollowApp.class, settings.build());
         sim.start();
-
     }
 }

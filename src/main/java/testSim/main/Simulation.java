@@ -79,12 +79,15 @@ public class Simulation {
 			// Initialize viewer
 			drawFrame = new DrawFrame(participants.keySet(), blockedRobots, settings);
 			drawFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			simEngine = new SimulationEngine(settings.SIM_TIMEOUT, settings.MSG_MEAN_DELAY, settings.MSG_STDDEV_DELAY, settings.MSG_LOSSES_PER_HUNDRED, settings.MSG_RANDOM_SEED, settings.TIC_TIME_RATE, blockedRobots, participants, drawFrame.getPanel(), logicThreads);
+			simEngine = new SimulationEngine(settings.SIM_TIMEOUT, settings.MSG_MEAN_DELAY,
+					settings.MSG_STDDEV_DELAY, settings.MSG_LOSSES_PER_HUNDRED, settings.MSG_RANDOM_SEED,
+					settings.TIC_TIME_RATE, blockedRobots, participants, drawFrame.getPanel(), logicThreads);
 		}
 		else{
 			drawFrame = null;
-			simEngine = new SimulationEngine(settings.SIM_TIMEOUT, settings.MSG_MEAN_DELAY, settings.MSG_STDDEV_DELAY, settings.MSG_LOSSES_PER_HUNDRED, settings.MSG_RANDOM_SEED, settings.TIC_TIME_RATE, blockedRobots, participants, null, logicThreads);
-
+			simEngine = new SimulationEngine(settings.SIM_TIMEOUT, settings.MSG_MEAN_DELAY,
+                    settings.MSG_STDDEV_DELAY, settings.MSG_LOSSES_PER_HUNDRED, settings.MSG_RANDOM_SEED,
+                    settings.TIC_TIME_RATE, blockedRobots, participants, null, logicThreads);
 		}
 
 
@@ -108,6 +111,8 @@ public class Simulation {
 			gps.setSensepoints(SptLoader.loadSensepoints(settings.SENSEPOINT_FILE));
 
 		// Load Obstacles
+        // Apparently there are no obstacles specified for the quadcopter
+        // So i'll make a file that does have obstacles for quadcopters
 		if(settings.OBSPOINT_FILE != null)
 		{			
 			gps.setObspoints(ObstLoader.loadObspoints(settings.OBSPOINT_FILE));
@@ -120,21 +125,25 @@ public class Simulation {
 			}
 			if(settings.N_IROBOTS > 0)
 			gps.setViews(list, settings.N_IROBOTS);
-			else
+			else if(settings.N_CARS > 0)
 				gps.setViews(list, settings.N_CARS);
+			else if(settings.N_IROBOTS == 0 && settings.N_CARS == 0 && settings.N_QUADCOPTERS > 0)
+			    gps.setViews(list, settings.N_QUADCOPTERS);
 		}
+
 		else{
 			//if we have no input files, we still have to initialize the obstacle list so that later on, if we detect collision between robots, we can add that obstacle
 			gps.setObspoints(new ObstacleList());
 			list = gps.getObspointPositions();
 			list.detect_Precision = settings.Detect_Precision;
 			list.de_Radius = settings.De_Radius;
-			if(settings.N_IROBOTS > 0)
-				gps.setViews(list, settings.N_IROBOTS);
-			else
-				gps.setViews(list, settings.N_CARS);
+            if(settings.N_IROBOTS > 0)
+                gps.setViews(list, settings.N_IROBOTS);
+            else if(settings.N_CARS > 0)
+                gps.setViews(list, settings.N_CARS);
+            else if(settings.N_IROBOTS == 0 && settings.N_CARS == 0 && settings.N_QUADCOPTERS > 0)
+                gps.setViews(list, settings.N_QUADCOPTERS);
 		}
-
 
 		this.settings = settings;
 		simEngine.setGps(gps);
@@ -146,14 +155,9 @@ public class Simulation {
 			t_initialPositions = WptLoader.loadWaypoints(settings.INITIAL_POSITIONS_FILE);
 		}
 		else
-			t_initialPositions = new PositionList<ItemPosition>();		
+			t_initialPositions = new PositionList<>();
 		Random rand = new Random();
-		/*
-		PositionList<Model_iRobot> initialPositions = new PositionList<Model_iRobot>();
-		for(ItemPosition t_pos : t_initialPositions){
-			initialPositions.update(new Model_iRobot(t_pos));
-		}
-		 */
+
 		// Create each iRobot
 		for(int i = 0; i < settings.N_IROBOTS; i++) {
 			Model_iRobot initialPosition = null;
@@ -195,8 +199,8 @@ public class Simulation {
 			bots.add(sa);
 			logicThreads.add(sa.logic);
 			simEngine.addLogging(sa.gvh.log);
-
 		}
+
 		for(int i = 0; i < settings.N_QUADCOPTERS; i++) {
 			Model_quadcopter initialPosition = null;
 			String botName = settings.QUADCOPTER_NAME + i;
@@ -223,7 +227,8 @@ public class Simulation {
 			}
 			initialPosition.radius = settings.BOT_RADIUS;
 
-			SimApp sa = new SimApp(botName, participants, simEngine, initialPosition, settings.TRACE_OUT_DIR, app, drawFrame, settings.TRACE_CLOCK_DRIFT_MAX, settings.TRACE_CLOCK_SKEW_MAX);
+			SimApp sa = new SimApp(botName, participants, simEngine, initialPosition, settings.TRACE_OUT_DIR, app,
+                    drawFrame, settings.TRACE_CLOCK_DRIFT_MAX, settings.TRACE_CLOCK_SKEW_MAX);
 			
 			bots.add(sa);
 
@@ -259,9 +264,7 @@ public class Simulation {
 			initialPosition.radius = settings.BOT_RADIUS;
 			SimApp sa = new SimApp(botName, participants, simEngine, initialPosition, settings.TRACE_OUT_DIR, app,
                                     drawFrame, settings.TRACE_CLOCK_DRIFT_MAX, settings.TRACE_CLOCK_SKEW_MAX);
-			System.out.println("biatch1");
 			bots.add(sa);
-			System.out.println("biatch2");
 			logicThreads.add(sa.logic);
 			simEngine.addLogging(sa.gvh.log);
 
@@ -405,27 +408,6 @@ public class Simulation {
 						rd.add(nextBot);
 					}
                 }
-
-                // the code below doesn't work because when using both bot types it will try to cast one as the other
-
-				/*if(((PositionList) arg).getList().get(0) instanceof Model_iRobot){
-					ArrayList<Model_iRobot> pos = ((PositionList<Model_iRobot>) arg).getList();
-					// Add robots
-					for(Model_iRobot ip : pos) {
-						RobotData nextBot = new RobotData(ip.name, ip.x, ip.y, ip.angle, ip.receivedTime);
-						nextBot.radius = settings.BOT_RADIUS;
-						rd.add(nextBot);
-					}
-				}
-				else if(((PositionList) arg).getList().get(0) instanceof Model_quadcopter){
-					ArrayList<Model_quadcopter> pos = ((PositionList<Model_quadcopter>) arg).getList();
-					// Add robots
-					for(Model_quadcopter ip : pos) {
-						RobotData nextBot = new RobotData(ip.name, ip.x, ip.y, ip.z, ip.yaw, ip.pitch, ip.roll, ip.receivedTime);
-						nextBot.radius = settings.BOT_RADIUS;
-						rd.add(nextBot);
-					}
-				}*/
 
 				gl.updateData(rd, simEngine.getTime());
 			}

@@ -151,14 +151,14 @@ public class DrawPanel extends ZoomablePanel
 			Point3d nextpoint = currobs.obstacle.firstElement();
 			Point3d curpoint = currobs.obstacle.firstElement();
 			int[] xs = new int[currobs.obstacle.size()]; 
-			int[] ys = new int[currobs.obstacle.size()]; ;
+			int[] ys = new int[currobs.obstacle.size()];
 			
 			for(int j = 0; j < currobs.obstacle.size() -1 ; j++){
-			curpoint = currobs.obstacle.get(j);
-			nextpoint = currobs.obstacle.get(j+1);
-			g.drawLine(curpoint.x, curpoint.y, nextpoint.x, nextpoint.y);
-			xs[j] = curpoint.x;
-			ys[j] = curpoint.y;
+				curpoint = currobs.obstacle.get(j);
+				nextpoint = currobs.obstacle.get(j+1);
+				g.drawLine(curpoint.x, curpoint.y, nextpoint.x, nextpoint.y);
+				xs[j] = curpoint.x;
+				ys[j] = curpoint.y;
 			}
 			xs[currobs.obstacle.size()-1] = nextpoint.x;
 			ys[currobs.obstacle.size()-1] = nextpoint.y;
@@ -166,8 +166,6 @@ public class DrawPanel extends ZoomablePanel
 			g.drawLine(nextpoint.x, nextpoint.y, currobs.obstacle.firstElement().x, currobs.obstacle.firstElement().y);
 			g.fillPolygon(xs,ys,currobs.obstacle.size());
 		}
-
-//		repaint();
 	}
 	
 	private void drawWireless(Graphics2D g)

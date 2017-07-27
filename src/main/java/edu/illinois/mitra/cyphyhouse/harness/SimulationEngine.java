@@ -40,7 +40,9 @@ public class SimulationEngine extends Thread {
 	ExplicitlyDrawable drawer = null;
 	List<LogicThread> logicThreads = null;
 
-	public SimulationEngine(long timeout, int meanDelay, int delayStdDev, int dropRate, int seed, double ticRate, Set<String> blockedRobots, Map<String, String> nameToIpMap, ExplicitlyDrawable drawer, List<LogicThread> logicThreads) {
+	public SimulationEngine(long timeout, int meanDelay, int delayStdDev, int dropRate, int seed, double ticRate,
+							Set<String> blockedRobots, Map<String, String> nameToIpMap, ExplicitlyDrawable drawer,
+							List<LogicThread> logicThreads) {
 		super("SimulationEngine");
 		comms = new DecoupledSimComChannel(meanDelay, delayStdDev, dropRate, seed, blockedRobots, nameToIpMap);
 		time = System.currentTimeMillis();

@@ -34,7 +34,7 @@ public class RealisticSimMotionAutomation_quadcopter extends MotionAutomation_qu
 	}
 
 	/**
-	 *  	take off from ground
+	 *  take off from ground
 	 */
 	@Override
 	protected void takeOff(){

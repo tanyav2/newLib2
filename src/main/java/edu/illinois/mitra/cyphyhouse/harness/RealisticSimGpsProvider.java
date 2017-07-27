@@ -60,10 +60,10 @@ public class RealisticSimGpsProvider extends Observable implements SimGpsProvide
 		
 		waypoint_positions = new PositionList<>();
 		sensepoint_positions = new PositionList<>();
-		iRobot_positions = new PositionList<Model_iRobot>();
+		iRobot_positions = new PositionList<>();
 		f110car_positions = new PositionList<>();
-		allpos = new PositionList<ItemPosition>();
-		quadcopter_positions = new PositionList<Model_quadcopter>();
+		allpos = new PositionList<>();
+		quadcopter_positions = new PositionList<>();
 		
 	}
 	
@@ -77,14 +77,14 @@ public class RealisticSimGpsProvider extends Observable implements SimGpsProvide
 		allpos.update((ItemPosition)bot);
 		if(bot instanceof Model_iRobot){
 			synchronized(iRobots) {
-				iRobots.put(((Model_iRobot)bot).name, new TrackedModel<Model_iRobot>((Model_iRobot) bot));
+				iRobots.put(((Model_iRobot)bot).name, new TrackedModel<>((Model_iRobot) bot));
 			}
 			iRobot_positions.update((Model_iRobot) bot);
 			
 		}
 		else if(bot instanceof Model_quadcopter){
 			synchronized(quadcopters) {
-				quadcopters.put(((Model_quadcopter)bot).name, new TrackedModel<Model_quadcopter>((Model_quadcopter) bot));
+				quadcopters.put(((Model_quadcopter)bot).name, new TrackedModel<>((Model_quadcopter) bot));
 			}
 			quadcopter_positions.update((Model_quadcopter) bot);
 		}

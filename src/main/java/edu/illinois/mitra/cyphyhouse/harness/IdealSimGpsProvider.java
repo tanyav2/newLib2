@@ -38,12 +38,12 @@ public class IdealSimGpsProvider extends Observable implements SimGpsProvider  {
 		this.posNoise = (int) posNoise;
 		this.rand = new Random();
 		
-		receivers = new HashMap<String, SimGpsReceiver>();
-		robots = new HashMap<String, TrackedRobot>();
+		receivers = new HashMap<>();
+		robots = new HashMap<>();
 		
-		robot_positions = new PositionList<Model_iRobot>();
-		waypoint_positions = new PositionList<ItemPosition>();
-		sensepoint_positions = new PositionList<ItemPosition>();
+		robot_positions = new PositionList<>();
+		waypoint_positions = new PositionList<>();
+		sensepoint_positions = new PositionList<>();
 	}
 	
 	@Override

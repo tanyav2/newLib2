@@ -22,7 +22,7 @@ public class Obstacles {
 	//once zero, it will be removed from the obsList
 
 	public Obstacles(){
-		obstacle = new Vector<Point3d>(4, 3); 
+		obstacle = new Vector<>(4, 3);
 	}
 
 	public Obstacles(Vector<Point3d> obstacle1) {

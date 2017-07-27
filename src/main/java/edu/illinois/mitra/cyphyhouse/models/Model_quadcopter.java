@@ -17,9 +17,9 @@ import edu.illinois.mitra.cyphyhouse.objects.PositionList;
 public class Model_quadcopter extends ItemPosition implements TrackedRobot{
 
 	// for default values, see initial_helper()
-	public double yaw;
-	public double pitch;
-	public double roll;
+	public static double yaw;
+	public static double pitch;
+	public static double roll;
 
 	//vertical speed
 	public double gaz;
@@ -68,6 +68,9 @@ public class Model_quadcopter extends ItemPosition implements TrackedRobot{
 	public double windxNoise;
 	public double windyNoise;
 
+    public boolean leftbump;
+    public boolean rightbump;
+
 	/**
 	 * Construct an Model_quadcopter from a received GPS broadcast message
 	 * 
@@ -75,7 +78,7 @@ public class Model_quadcopter extends ItemPosition implements TrackedRobot{
 	 * @throws ItemFormattingException
 	 */
 
-	public Model_quadcopter(String received) throws ItemFormattingException{
+	public Model_quadcopter(String received) throws ItemFormattingException {
 		initial_helper();
 		String[] parts = received.replace(",", "").split("\\|");
 		if(parts.length == 9) {
@@ -85,7 +88,8 @@ public class Model_quadcopter extends ItemPosition implements TrackedRobot{
 			this.z = Integer.parseInt(parts[4]);
 			this.yaw = Integer.parseInt(parts[5]);
 			this.pitch = Integer.parseInt(parts[6]);
-			this.roll = Integer.parseInt(parts[7]);			
+			this.roll = Integer.parseInt(parts[7]);
+			System.out.println("wyoming is a good place: received: " + received);
 		} else {
 			throw new ItemFormattingException("Should be length 9, is length " + parts.length);
 		}
@@ -93,11 +97,13 @@ public class Model_quadcopter extends ItemPosition implements TrackedRobot{
 
 	public Model_quadcopter(String name, int x, int y) {
 		super(name, x, y, 0);
+        System.out.println("wyoming is a good place 2");
 		initial_helper();
 	}
 
 	public Model_quadcopter(String name, int x, int y, int z) {
 		super(name, x, y, z);
+        System.out.println("wyoming is a good place 3");
 		initial_helper();
 	}
 
@@ -108,18 +114,22 @@ public class Model_quadcopter extends ItemPosition implements TrackedRobot{
 		this.pitch = pitch;
 		this.roll = roll;
 		this.radius = radius;
+        System.out.println("wyoming is a good place 4");
 	}
 
 	public Model_quadcopter(String name, int x, int y, int z, int yaw) {
 		super(name, x, y, z);
 		initial_helper();
 		this.yaw = yaw;
+        System.out.println("wyoming is a good place 5");
 	}
 
 
 	public Model_quadcopter(ItemPosition t_pos) {
 		super(t_pos.name, t_pos.x, t_pos.y, t_pos.z);
 		initial_helper();
+        System.out.println("wyoming is a good place 6 - item pos: " + t_pos);
+
 	}
 
 	@Override 
@@ -205,7 +215,8 @@ public class Model_quadcopter extends ItemPosition implements TrackedRobot{
 		if(collision_point == null){
 			return;
 		} else{
-			gaz = -1000;
+		    System.out.println("someone hurt me but i can deal with it" + collision_point);
+			gaz = -30;
 		}
 	}
 
@@ -219,7 +230,7 @@ public class Model_quadcopter extends ItemPosition implements TrackedRobot{
 			v_yaw = v_yaw_p;
 			v_x = v_x_p;
 			v_y = v_y_p;
-			v_z = v_z_p;	
+			v_z = v_z_p;
 		}
 		else{
 			z = z_p;

@@ -254,8 +254,10 @@ public class MotionAutomation_F110Car extends RobotMotion {
                                     straight(LinSpeed(distance));
                                 if(Common.inRange(absangle, param.SMALLTURN_ANGLE, param.ARCANGLE_MAX))
                                     next = STAGE.SMALLTURN;
-                                if(absangle > param.ARCANGLE_MAX)
+                                if(absangle > param.ARCANGLE_MAX) {
                                     next = STAGE.TURN;
+                                }
+
                             }
                             break;
                         case TURN:
@@ -506,8 +508,6 @@ public class MotionAutomation_F110Car extends RobotMotion {
                 ColPoint_x = mypos.radius*(Math.cos(Math.toRadians(mypos.angle+45))) + mypos.x;
                 ColPoint_y = mypos.radius*(Math.sin(Math.toRadians(mypos.angle+45))) + mypos.y;
                 blocker = new ItemPosition("detected", (int) ColPoint_x, (int) ColPoint_y, 0);
-
-
             }
             else{
                 ColPoint_x = mypos.radius*(Math.cos(Math.toRadians(mypos.angle-45))) + mypos.x;
