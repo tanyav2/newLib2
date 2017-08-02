@@ -8,15 +8,15 @@ public class ObstLoader {
 
 	private ObstLoader() {
 	}
+
 	public static ObstacleList loadObspoints(String file) {
 		ObstacleList Obspoints = new ObstacleList();
-		BufferedReader in = null;
+		BufferedReader in;
         InputStream inputStream =
                 WptLoader.class.getClassLoader().getResourceAsStream(file);
         if(inputStream != null){
             in = new BufferedReader(new InputStreamReader(inputStream));
-        }else{
-
+        } else {
             try {
                 in = new BufferedReader(new FileReader("waypoints/" + file));
             } catch (FileNotFoundException e) {
@@ -26,7 +26,6 @@ public class ObstLoader {
             }
         }
 
-		
 		String line;
 		try {
 			while((line = in.readLine()) != null) {
@@ -36,9 +35,6 @@ public class ObstLoader {
 						int j;
 						for(j = 1; j<((parts.length)-2); j+=2)
 						{
-						    // added a parseInt to account for z coordinates
-                            // the fact that the irobot doesn't give a shit about the z coordinates
-                            // might be because we dont' seem to give a shit about z
 							point.add(Integer.parseInt(parts[j]),Integer.parseInt(parts[j+1]), Integer.parseInt(parts[j+2]));
 						}
 						point.timeFrame = Integer.parseInt(parts[j]);
@@ -46,16 +42,14 @@ public class ObstLoader {
 						Obspoints.ObList.add(point);
 					}
 					if(parts[0].equals("Hidden")) {
-						int j;
-						for(j = 1; j<((parts.length)-2); j+=2)
-						{
-							point.add(Integer.parseInt(parts[j]),Integer.parseInt(parts[j+1]));
-						}
-						point.timeFrame = Integer.parseInt(parts[j]);
-						point.hidden = true;
-						Obspoints.ObList.add(point);
-					}
-					
+                        int j;
+                        for (j = 1; j < ((parts.length) - 2); j += 2) {
+                            point.add(Integer.parseInt(parts[j]), Integer.parseInt(parts[j + 1]));
+                        }
+                        point.timeFrame = Integer.parseInt(parts[j]);
+                        point.hidden = true;
+                        Obspoints.ObList.add(point);
+                    }
 			}
 			in.close();
 		} catch (IOException e) {
@@ -63,5 +57,4 @@ public class ObstLoader {
 		}
 		return Obspoints;
 	}
-	
 }

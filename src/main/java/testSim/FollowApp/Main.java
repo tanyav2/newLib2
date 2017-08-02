@@ -24,7 +24,7 @@ public class Main {
         settings.TIC_TIME_RATE(2);
 
         // Pick waypoints
-        settings.WAYPOINT_FILE("3dobstaclepoints.wpt");
+        // settings.WAYPOINT_FILE("3dobstaclepoints.wpt");
         settings.OBSPOINT_FILE("square.wpt");
 
         // No idea what it does
